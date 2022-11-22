@@ -1,5 +1,6 @@
 Image:
-  Os: {{ os }}
+  Os: alinux2
+  CustomAmi: ami-06bb6bb60c6c1b40b
 Tags:
   - Key: key
     Value: value3
