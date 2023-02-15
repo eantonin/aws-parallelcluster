@@ -65,6 +65,7 @@ ANOTHER_INSTANCE_TYPE_BY_ARCH = {
 OS_MAPPING = {
     "centos7": "centos",
     "alinux2": "ec2-user",
+    "rhel8": "ec2-user",
     "ubuntu1804": "ubuntu",
     "ubuntu2004": "ubuntu",
 }

@@ -41,6 +41,7 @@ OS_TO_OFFICIAL_AMI_NAME_OWNER_MAP = {
         "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-*-server-*",
         "owners": ["099720109477"],
     },
+    "rhel8": {"name": "RHEL-8.*.*_HVM", "owners": ["amazon"]},
 }
 
 # Remarkable AMIs are latest deep learning base AMI and FPGA developer AMI without pcluster infrastructure
