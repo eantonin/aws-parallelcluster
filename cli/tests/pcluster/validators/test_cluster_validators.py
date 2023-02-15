@@ -531,6 +531,8 @@ def test_efa_security_group_validator(
         (True, "ubuntu1804", "arm64", None),
         (True, "ubuntu2004", "x86_64", None),
         (True, "ubuntu2004", "arm64", None),
+        (True, "rhel8", "x86_64", None),
+        (True, "rhel8", "arm64", None),
     ],
 )
 def test_efa_os_architecture_validator(efa_enabled, os, architecture, expected_message):
@@ -564,11 +566,13 @@ def test_efa_multi_az_validator(multi_az_enabled, efa_enabled, expected_message)
         # All OSes supported for x86_64
         ("alinux2", "x86_64", None, None, None),
         ("alinux2", "x86_64", "custom-ami", None, None),
+        ("rhel8", "x86_64", None, None, None),
+        ("rhel8", "x86_64", "custom-ami", None, None),
         ("centos7", "x86_64", None, None, None),
         ("centos7", "x86_64", "custom-ami", None, None),
         ("ubuntu1804", "x86_64", None, None, None),
         ("ubuntu2004", "x86_64", None, None, None),
-        # All OSes supported for x86_64
+        # All OSes supported for ARM
         ("alinux2", "arm64", None, None, None),
         ("alinux2", "arm64", "custom-ami", None, None),
         (
@@ -582,6 +586,8 @@ def test_efa_multi_az_validator(multi_az_enabled, efa_enabled, expected_message)
         ("centos7", "arm64", "custom-ami", None, None),
         ("ubuntu1804", "arm64", None, None, None),
         ("ubuntu2004", "arm64", None, None, None),
+        ("rhel8", "arm64", None, None, None),
+        ("rhel8", "arm64", "custom-ami", None, None),
     ],
 )
 def test_architecture_os_validator(os, architecture, custom_ami, ami_search_filters, expected_message):
