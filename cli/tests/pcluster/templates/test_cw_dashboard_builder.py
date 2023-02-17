@@ -27,6 +27,7 @@ from tests.pcluster.models.dummy_s3_bucket import dummy_cluster_bucket, mock_buc
     "config_file_name",
     [
         "centos7.slurm.full.yaml",
+        "rhel8.slurm.full.yaml",
         "alinux2.slurm.conditional_vol.yaml",
         "ubuntu18.slurm.simple.yaml",
         "alinux2.batch.no_head_node_log.yaml",

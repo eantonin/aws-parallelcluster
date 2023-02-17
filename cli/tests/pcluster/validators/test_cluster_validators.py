@@ -204,7 +204,9 @@ def test_region_validator(region, expected_message):
         ("ubuntu1804", "slurm", None),
         ("ubuntu2004", "slurm", None),
         ("alinux2", "slurm", None),
+        ("rhel8", "slurm", None),
         ("centos7", "awsbatch", "scheduler supports the following operating systems"),
+        ("rhel8", "awsbatch", "scheduler supports the following operating systems"),
         ("ubuntu1804", "awsbatch", "scheduler supports the following operating systems"),
         ("ubuntu2004", "awsbatch", "scheduler supports the following operating systems"),
         ("alinux2", "awsbatch", None),
@@ -982,10 +984,12 @@ def test_fsx_network_validator(
         # Supported combinations
         ("x86_64", "alinux2", None),
         ("x86_64", "centos7", None),
+        ("x86_64", "rhel8", None),
         ("x86_64", "ubuntu1804", None),
         ("x86_64", "ubuntu2004", None),
         ("arm64", "ubuntu1804", None),
         ("arm64", "ubuntu2004", None),
+        ("arm64", "rhel8", None),
         ("arm64", "alinux2", None),
         # Unsupported combinations
         (
@@ -1157,6 +1161,7 @@ def test_shared_storage_mount_dir_validator(mount_dir, expected_message):
     [
         (True, "centos7", "t2.medium", None, None, None),
         (True, "ubuntu1804", "t2.medium", None, None, None),
+        (True, "rhel8", "t2.medium", None, None, None),
         (True, "ubuntu1804", "t2.medium", None, "1.2.3.4/32", None),
         (True, "ubuntu2004", "t2.medium", None, None, None),
         (True, "centos7", "t2.medium", "0.0.0.0/0", 8443, "port 8443 to the world"),
@@ -1166,6 +1171,7 @@ def test_shared_storage_mount_dir_validator(mount_dir, expected_message):
         (False, "alinux2", "t2.micro", None, None, None),  # doesn't fail because DCV is disabled
         (True, "ubuntu1804", "m6g.xlarge", None, None, None),
         (True, "alinux2", "m6g.xlarge", None, None, None),
+        (True, "rhel8", "m6g.xlarge", None, None, None),
         (True, "ubuntu2004", "m6g.xlarge", None, None, "Please double check the os configuration"),
     ],
 )
@@ -1203,6 +1209,7 @@ def test_intel_hpc_architecture_validator(architecture, expected_message):
         ("alinux2", "the operating system is required to be set"),
         ("ubuntu1804", "the operating system is required to be set"),
         ("ubuntu2004", "the operating system is required to be set"),
+        ("rhel8", "the operating system is required to be set"),
         # TODO migrate the parametrization below to unit test for the whole model
         # intel hpc disabled, you can use any os
         # ({"enable_intel_hpc_platform": "false", "base_os": "alinux"}, None),
