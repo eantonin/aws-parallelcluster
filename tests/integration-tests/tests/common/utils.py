@@ -50,6 +50,8 @@ OS_TO_REMARKABLE_AMI_NAME_OWNER_MAP = {
     "centos7": {"name": "FPGA Developer AMI*", "owners": ["679593333241"]},
     "ubuntu1804": {"name": "Deep Learning Base AMI (Ubuntu 18.04)*", "owners": ["amazon"]},
     "ubuntu2004": {"name": "Deep Learning AMI GPU CUDA * (Ubuntu 20.04)*", "owners": ["amazon"]},
+    #The name below is guessed, I haven't found any RH8 image with those features
+    "rhel8": {"name": "Deep Learning AMI GPU CUDA * (RHEL 8)*", "owners": ["amazon"]},
 }
 
 OS_TO_KERNEL4_AMI_NAME_OWNER_MAP = {
@@ -64,6 +66,7 @@ OS_TO_PCLUSTER_AMI_NAME_OWNER_MAP = {
     "centos7": {"name": "centos7-hvm-x86_64-*", "owners": PCLUSTER_AMI_OWNERS},
     "ubuntu1804": {"name": "ubuntu-1804-lts-hvm-*-*", "owners": PCLUSTER_AMI_OWNERS},
     "ubuntu2004": {"name": "ubuntu-2004-lts-hvm-*-*", "owners": PCLUSTER_AMI_OWNERS},
+    "rhel8": {"name": "rhel8-hvm-*-*", "owners": PCLUSTER_AMI_OWNERS},
 }
 
 AMI_TYPE_DICT = {
