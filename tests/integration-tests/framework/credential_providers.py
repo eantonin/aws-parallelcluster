@@ -9,8 +9,11 @@ import logging
 import os
 import re
 from contextlib import contextmanager
+from functools import partial
 
 import boto3
+from botocore.credentials import RefreshableCredentials
+from botocore.session import get_session
 from utils import run_command
 
 cli_credentials = {}
@@ -57,18 +60,28 @@ def sts_credential_provider(region, credential_arn, credential_external_id=None,
     credentials_to_backup = _get_current_credentials()
 
     logging.info("Assuming STS credentials for region %s and role %s", region, credential_arn)
-    aws_credentials = _retrieve_sts_credential(region, credential_arn, credential_external_id, credential_endpoint)
+    aws_credentials = _retrieve_sts_credential(region, credential_arn, credentials_to_backup, credential_external_id, credential_endpoint)
+    refreshable_credentials = RefreshableCredentials.create_from_metadata(
+        metadata=aws_credentials,
+        refresh_using=partial(
+            _retrieve_sts_credential, region, credential_arn, credentials_to_backup, credential_external_id, credential_endpoint
+        ),
+        method="sts-assume-role",
+    )
     logging.info("Retrieved credentials %s", obfuscate_credentials(aws_credentials))
 
     try:
         logging.info("Unsetting current credentials %s", obfuscate_credentials(credentials_to_backup))
         _unset_credentials()
 
-        os.environ["AWS_ACCESS_KEY_ID"] = aws_credentials["AccessKeyId"]
-        os.environ["AWS_SECRET_ACCESS_KEY"] = aws_credentials["SecretAccessKey"]
-        os.environ["AWS_SESSION_TOKEN"] = aws_credentials["SessionToken"]
-        os.environ["AWS_CREDENTIAL_EXPIRATION"] = aws_credentials["Expiration"].isoformat()
-        boto3.setup_default_session()
+        os.environ["AWS_ACCESS_KEY_ID"] = aws_credentials["access_key"]
+        os.environ["AWS_SECRET_ACCESS_KEY"] = aws_credentials["secret_key"]
+        os.environ["AWS_SESSION_TOKEN"] = aws_credentials["token"]
+        os.environ["AWS_CREDENTIAL_EXPIRATION"] = aws_credentials["expiry_time"]
+        botocore_session = get_session()
+        botocore_session._credentials = refreshable_credentials
+        botocore_session.set_config_variable("region", region)
+        boto3.setup_default_session(botocore_session=botocore_session)
 
         yield aws_credentials
     finally:
@@ -77,7 +90,8 @@ def sts_credential_provider(region, credential_arn, credential_external_id=None,
 
 
 # TODO: we could add caching but we need to refresh the creds if 1h is passed or increase the MaxSessionDuration
-def _retrieve_sts_credential(region, credential_arn, credential_external_id=None, credential_endpoint=None):
+def _retrieve_sts_credential(region, credential_arn, credentials_to_use, credential_external_id=None, credential_endpoint=None):
+    _restore_credentials(credentials_to_use)
     if credential_endpoint:
         match = re.search(r"https://sts\.(.*?)\.", credential_endpoint)
         endpoint_region = match.group(1)
@@ -94,8 +108,14 @@ def _retrieve_sts_credential(region, credential_arn, credential_external_id=None
 
     assumed_role_object = sts.assume_role(**assume_role_kwargs)
     aws_credentials = assumed_role_object["Credentials"]
+    logging.info("Assumed new credentials, new expiration is %s", aws_credentials.get("Expiration").isoformat())
 
-    return aws_credentials
+    return {
+        "access_key": aws_credentials.get("AccessKeyId"),
+        "secret_key": aws_credentials.get("SecretAccessKey"),
+        "token": aws_credentials.get("SessionToken"),
+        "expiry_time": aws_credentials.get("Expiration").isoformat(),
+    }
 
 
 def _unset_credentials():
@@ -108,6 +128,8 @@ def _unset_credentials():
         del os.environ["AWS_SESSION_TOKEN"]
     if "AWS_PROFILE" in os.environ:
         del os.environ["AWS_PROFILE"]
+    if "AWS_CREDENTIAL_EXPIRATION" in os.environ:
+        del os.environ["AWS_CREDENTIAL_EXPIRATION"]
 
 
 def _restore_credentials(creds_to_restore):
@@ -125,6 +147,7 @@ def _get_current_credentials():
         "AWS_SECRET_ACCESS_KEY": os.environ.get("AWS_SECRET_ACCESS_KEY"),
         "AWS_SESSION_TOKEN": os.environ.get("AWS_SESSION_TOKEN"),
         "AWS_PROFILE": os.environ.get("AWS_PROFILE"),
+        "AWS_CREDENTIAL_EXPIRATION": os.environ.get("AWS_CREDENTIAL_EXPIRATION"),
     }
 
 
@@ -146,7 +169,7 @@ def obfuscate_credentials(creds_dict):
     obfuscated_dict = {}
     for key, value in creds_dict.items():
         if value:
-            if key == "Expiration":
+            if key == "expiry_time" or key == "AWS_CREDENTIAL_EXPIRATION":
                 obfuscated_dict[key] = str(value)
             else:
                 obfuscated_dict[key] = value[0:3] + "*" * (len(value) - 3)
