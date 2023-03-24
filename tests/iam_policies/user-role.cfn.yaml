@@ -91,20 +91,6 @@ Resources:
 
   ### IAM POLICIES
 
-  #This let the ParallelClusterUserRole assume itself, needed for credential refresh
-  ParallelClusterUserRoleAccessPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      Roles:
-        - !Ref ParallelClusterUserRole
-      PolicyName: parallelcluster_user_role_access_policy
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action: 'sts:AssumeRole'
-            Resource: !GetAtt ParallelClusterUserRole.Arn
-
   DefaultParallelClusterIamAdminPolicy:
     Type: AWS::IAM::ManagedPolicy
     Condition: EnableIamPolicy

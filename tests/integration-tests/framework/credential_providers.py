@@ -60,11 +60,18 @@ def sts_credential_provider(region, credential_arn, credential_external_id=None,
     credentials_to_backup = _get_current_credentials()
 
     logging.info("Assuming STS credentials for region %s and role %s", region, credential_arn)
-    aws_credentials = _retrieve_sts_credential(region, credential_arn, credentials_to_backup, credential_external_id, credential_endpoint)
+    aws_credentials = _retrieve_sts_credential(
+        region, credential_arn, credentials_to_backup, credential_external_id, credential_endpoint
+    )
     refreshable_credentials = RefreshableCredentials.create_from_metadata(
         metadata=aws_credentials,
         refresh_using=partial(
-            _retrieve_sts_credential, region, credential_arn, credentials_to_backup, credential_external_id, credential_endpoint
+            _retrieve_sts_credential,
+            region,
+            credential_arn,
+            credentials_to_backup,
+            credential_external_id,
+            credential_endpoint,
         ),
         method="sts-assume-role",
     )
@@ -90,7 +97,9 @@ def sts_credential_provider(region, credential_arn, credential_external_id=None,
 
 
 # TODO: we could add caching but we need to refresh the creds if 1h is passed or increase the MaxSessionDuration
-def _retrieve_sts_credential(region, credential_arn, credentials_to_use, credential_external_id=None, credential_endpoint=None):
+def _retrieve_sts_credential(
+    region, credential_arn, credentials_to_use, credential_external_id=None, credential_endpoint=None
+):
     _restore_credentials(credentials_to_use)
     if credential_endpoint:
         match = re.search(r"https://sts\.(.*?)\.", credential_endpoint)
