@@ -13,6 +13,7 @@
 
 import logging
 import os
+import lzma
 import shutil
 import subprocess
 import sys
