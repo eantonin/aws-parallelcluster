@@ -100,6 +100,7 @@ def sts_credential_provider(region, credential_arn, credential_external_id=None,
 def _retrieve_sts_credential(
     region, credential_arn, credentials_to_use, credential_external_id=None, credential_endpoint=None
 ):
+    logging.info("Start the retrieve credential method")
     _restore_credentials(credentials_to_use)
     if credential_endpoint:
         match = re.search(r"https://sts\.(.*?)\.", credential_endpoint)

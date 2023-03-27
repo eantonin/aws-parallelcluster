@@ -1,5 +1,5 @@
 Build:
     Imds:
-        ImdsSupport: v1.0
+        ImdsSupport: v2.0
     InstanceType: {{ instance }}
     ParentImage: {{ parent_image }}
