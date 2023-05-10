@@ -88,11 +88,15 @@ class PasswordSecretArnValidator(Validator):
             LOGGER.debug("Validating %s", str(password_secret_arn))
             arn_components = password_secret_arn.split(":")
             LOGGER.debug("Arn components %s", str(arn_components))
-            service, resource = arn_components[2], arn_components[5]
+            service = arn_components[2]
+            resource = arn_components[5]
+            if service == "ssm":
+                resource = arn_components[5].split("/")[0]
+
             if service == "secretsmanager" and resource == "secret" and region != "us-isob-east-1":
                 AWSApi.instance().secretsmanager.describe_secret(password_secret_arn)
             elif service == "ssm" and resource == "parameter" and region == "us-isob-east-1":
-                parameter_name = arn_components[-1]
+                parameter_name = arn_components[5].split("/")[1]
                 AWSApi.instance().ssm.get_parameter(parameter_name)
             else:
                 self._add_failure(
