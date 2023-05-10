@@ -89,6 +89,7 @@ class PasswordSecretArnValidator(Validator):
             # We only require the secret to exist; we do not validate its content.
             LOGGER.debug("Validating %s", str(password_secret_arn))
             arn_components = Arn.split(password_secret_arn, ArnFormat.COLON_RESOURCE_NAME)
+            LOGGER.debug("Arn components %s", str(arn_components))
             service, resource = arn_components.service, arn_components.resource
             if service == "secretsmanager" and resource == "secret" and region != "us-isob-east-1":
                 AWSApi.instance().secretsmanager.describe_secret(password_secret_arn)
