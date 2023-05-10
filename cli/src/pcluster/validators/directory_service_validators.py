@@ -10,6 +10,7 @@
 # limitations under the License.
 
 import re
+import logging
 from urllib.parse import urlparse
 
 from aws_cdk.core import Arn, ArnFormat
@@ -18,6 +19,8 @@ from pcluster.aws.aws_api import AWSApi
 from pcluster.aws.common import AWSClientError
 from pcluster.constants import DIRECTORY_SERVICE_RESERVED_SETTINGS
 from pcluster.validators.common import FailureLevel, Validator
+
+LOGGER = logging.getLogger(__name__)
 
 
 class DomainAddrValidator(Validator):
@@ -84,6 +87,7 @@ class PasswordSecretArnValidator(Validator):
         """
         try:
             # We only require the secret to exist; we do not validate its content.
+            LOGGER.debug("Validating %s", str(password_secret_arn))
             arn_components = Arn.split(password_secret_arn, ArnFormat.COLON_RESOURCE_NAME)
             service, resource = arn_components.service, arn_components.resource
             if service == "secretsmanager" and resource == "secret" and region != "us-isob-east-1":
